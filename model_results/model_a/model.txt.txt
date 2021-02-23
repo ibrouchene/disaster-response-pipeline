@@ -1,0 +1,8 @@
+- Standard text processing
+- No grid search
+- Pipeline used:
+	pipeline = Pipeline([
+        ('vect', CountVectorizer(tokenizer=tokenize)),
+        ('tfidf', TfidfTransformer()),
+        ('clf', MultiOutputClassifier(RandomForestClassifier()))
+    ])
