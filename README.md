@@ -34,7 +34,7 @@ The ML pipeline implements usual methods used in Natural Language Processing and
 * Saves the model in a pickle file
 
 # The web app
-The web app implementation is to be found in the ***app*** folder of the repository. Given an input message, the web app will load the trained model from the previously mentionned pickle file and output the results for each of the 36 categories.
+The web app implementation is to be found in the ***app*** folder of the repository. Given an input message, the web app will load the trained model from the previously mentionned pickle file and output the results for each of the 36 categories. Once the web app is up and running, the app can be accessed by simply connecting to the 3001 port of your machine's local network IP adress (example: 192.168.1.2:3001)
 
 # Comparing models
 Getting the best possible classifier was not part of the scope of the project, however it is still a good idea to be able to compare more easily some models. For this purpose a folder with a specific structure has been added. For each model, it contains the pickle file, a text description of the model and the evaluation results of the model based on the test data set.
