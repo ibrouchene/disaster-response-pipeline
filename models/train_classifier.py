@@ -1,36 +1,30 @@
 # import libraries
-import sys
-import re
-import nltk
-from nltk.tokenize import word_tokenize
-from nltk.stem import WordNetLemmatizer
-import pandas as pd
-from sqlalchemy import create_engine
-import numpy as np
 import pickle as pk
+import re
+import sys
+
+import nltk
+import pandas as pd
 # Lets import the machine learning stuff
 import sklearn
-from sklearn.pipeline import Pipeline
-from sklearn import preprocessing
-from sklearn.model_selection import GridSearchCV
-from sklearn.metrics import confusion_matrix
-from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.multioutput import MultiOutputClassifier
-from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
-from sklearn.pipeline import Pipeline, FeatureUnion
-from sklearn.svm import LinearSVC
-from sklearn.naive_bayes import BernoulliNB
-from sklearn.base import BaseEstimator, TransformerMixin
 from nltk.corpus import stopwords
-from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
 from nltk.stem.porter import PorterStemmer
+from nltk.tokenize import word_tokenize
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
+from sklearn.metrics import confusion_matrix
+from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import train_test_split
+from sklearn.multioutput import MultiOutputClassifier
+from sklearn.pipeline import Pipeline
+from sqlalchemy import create_engine
 
 nltk.download(['punkt', 'wordnet', 'averaged_perceptron_tagger', 'stopwords'])
 
 
 def load_data(database_filepath):
+    """ Loads the input data from the specified SQLite database file """
     engine = create_engine('sqlite:///'+database_filepath)
     df = pd.read_sql_table('Messages', engine)
     X = df.message.values
@@ -41,7 +35,11 @@ def load_data(database_filepath):
 
 
 def tokenize(text):
-    """ Follows the standard text processing flow """
+    """ Follows the standard text processing flow
+     1. Normalize: remove punctuation, set all to lowercase
+     2. Tokenize
+     3. Remove  stopwords (English dictionary expected)
+     4. Stem & Lemmatize """
     # Normalize
     text = re.sub(r"[^a-zA-Z0-9]", " ", text.lower())
 
@@ -62,31 +60,38 @@ def tokenize(text):
 
 
 def build_model():
+    """ Setting up of the machine learning pipeline
+    """
     pipeline = Pipeline([
         ('vect', CountVectorizer(tokenizer=tokenize)),
         ('tfidf', TfidfTransformer()),
-        ('clf', MultiOutputClassifier(BernoulliNB()))
+        ('clf', MultiOutputClassifier(RandomForestClassifier()))
     ])
     parameters = {
         'vect__max_df': (0.5, 1.0),
+        'vect__max_features': (None, 5000),
         'tfidf__use_idf': (True, False),
-        'clf__estimator__alpha': (0.005, 1.0)
+        'clf__estimator__n_estimators': [50,  200],
+        'clf__estimator__min_samples_split': [2, 4]
     }
     cv = GridSearchCV(pipeline, param_grid=parameters)
     return cv
 
 
 def evaluate_model(model, X_test, Y_test, category_names):
+    """ Evaluates the model on the test data set and writes out a csv file with the results """
     y_pred = model.predict(X_test)
     df = get_results(Y_test, y_pred, category_names)
     df.to_csv(r".\model_results.csv", sep=";")
 
 
 def save_model(mod, model_filepath):
+    """ Saves the built model in a pickle file under the specified file path """
     pk.dump(mod, open(model_filepath, "wb"))
 
 
 def get_results(y_test, y_pred, cat_names):
+    """ Returns a dataframe containing the results out of the classification_report method of sklearn.metrics """
     res = sklearn.metrics.classification_report(y_test, y_pred, output_dict=True, zero_division=0, target_names=cat_names)
     df = pd.DataFrame(res)
     return df.T
