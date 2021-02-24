@@ -43,6 +43,4 @@ model_results
      - classifier.pkl
      - model_results.csv  
 
-For an easy manipulation of the data and easy visualization, the Jupiter notebook *** model_comparison.ipynb *** can be loaded. It contains methods that will loop through the model_results folder, read the model's results, format them and compares them.
-
-example: 
+For an easy manipulation of the data and easy visualization, the Jupiter notebook ***model_comparison.ipynb*** can be loaded. It contains methods that will loop through the model_results folder, read the model's results, format them and compares them.
