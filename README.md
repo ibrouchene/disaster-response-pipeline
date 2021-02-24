@@ -46,3 +46,12 @@ model_results
 
 For an easy manipulation of the data and easy visualization, the Jupiter notebook ***model_comparison.ipynb*** can be loaded. It contains methods that will loop through the model_results folder, read the model's results, format them and compares them, as shown in the following screenshot:  
 ![model_comp](doc/img/model_comparison_example.png "model comparison")
+
+# A word about the data & the performance
+![category_distribution](doc/img/category_distribution.png "distribution of categories")  
+Having a look at the category distribution in the data, we can immediately see that:  
+* There are some "main" categories that encompass smaller categories -> Storm, Flood, Fire, Earthquake, Cold and Other_weather are all subcategories of Weather_related.
+* There is a great disparity in the amount of labels per category. In that disparity, we can see that the subcategory information is less available.
+
+These observations leads to classifier not properly assigning all the correct (sub)categories to some messages. For instance the "Fire" category only has about 280 labels, which significantly shows when looking at the f1-score of the classification for instance. The max score obtained for this category is at about 0.12, while a much more represented category like "Food" reaches up to 0.7.  
+Considering that some categories are subcategories of others might indicate that a better performance can be reached by using this information and engineering new features. However this was not done in the scope of this project.
